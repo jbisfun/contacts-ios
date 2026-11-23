@@ -1,3 +1,4 @@
+import FossifyCommons
 import Foundation
 import SwiftUI
 
@@ -75,12 +76,7 @@ func highlighted(_ text: String, _ part: String, color: Color) -> AttributedStri
     return a
 }
 
-enum Launcher {
-    static func open(_ url: URL?) {
-        guard let url else { return }
-        UIApplication.shared.open(url)
-    }
-
+extension Launcher {
     static func call(_ number: String) {
         open(URL(string: "tel:" + number.normalizedPhoneNumber))
     }

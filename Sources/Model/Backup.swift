@@ -1,3 +1,4 @@
+import FossifyCommons
 import Foundation
 
 /// Automatic backups (AutomaticBackupReceiver). Android schedules an alarm at 6 AM;

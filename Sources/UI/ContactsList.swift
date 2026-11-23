@@ -1,3 +1,4 @@
+import FossifyCommons
 import SwiftUI
 
 enum ListLocation { case contacts, favorites, groupContacts }

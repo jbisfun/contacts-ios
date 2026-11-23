@@ -1,21 +1,15 @@
+import FossifyCommons
 import Observation
 import SwiftUI
 
-/// Port of Fossify's BaseConfig + contacts Config (SharedPreferences -> UserDefaults).
+/// Port of the contacts Config (SharedPreferences -> UserDefaults); colors and font size live in FossifyCommons.BaseConfig.
 @Observable
 final class Config {
     static let shared = Config()
 
     @ObservationIgnored private let d = UserDefaults.standard
 
-    // Colors
-    var theme: ThemeKind { didSet { d.set(theme.rawValue, forKey: "theme") } }
-    var customTextColor: UInt32 { didSet { d.set(Int(customTextColor), forKey: "text_color") } }
-    var customBackgroundColor: UInt32 { didSet { d.set(Int(customBackgroundColor), forKey: "background_color") } }
-    var customPrimaryColor: UInt32 { didSet { d.set(Int(customPrimaryColor), forKey: "primary_color") } }
-
     // General
-    var fontSize: FontSize { didSet { d.set(fontSize.rawValue, forKey: "font_size") } }
     var showContactFields: ShowField { didSet { d.set(showContactFields.rawValue, forKey: "show_contact_fields") } }
     var mergeDuplicateContacts: Bool { didSet { d.set(mergeDuplicateContacts, forKey: "merge_duplicate_contacts") } }
     var showCallConfirmation: Bool { didSet { d.set(showCallConfirmation, forKey: "show_call_confirmation") } }
@@ -55,11 +49,6 @@ final class Config {
     var lastExportFilename: String { didSet { d.set(lastExportFilename, forKey: "last_export_filename") } }
 
     private init() {
-        theme = ThemeKind(rawValue: d.integer(forKey: "theme")) ?? .system
-        customTextColor = UInt32(truncatingIfNeeded: d.object(forKey: "text_color") as? Int ?? 0xFF2D2D2D)
-        customBackgroundColor = UInt32(truncatingIfNeeded: d.object(forKey: "background_color") as? Int ?? 0xFFFFFFFF)
-        customPrimaryColor = UInt32(truncatingIfNeeded: d.object(forKey: "primary_color") as? Int ?? 0xFF106D1F)
-        fontSize = FontSize(rawValue: d.object(forKey: "font_size") as? Int ?? FontSize.large.rawValue) ?? .large
         showContactFields = ShowField(rawValue: d.object(forKey: "show_contact_fields") as? Int ?? ShowField.defaults.rawValue)
         mergeDuplicateContacts = d.object(forKey: "merge_duplicate_contacts") as? Bool ?? true
         showCallConfirmation = d.object(forKey: "show_call_confirmation") as? Bool ?? false

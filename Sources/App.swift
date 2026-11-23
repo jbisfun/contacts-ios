@@ -1,3 +1,4 @@
+import FossifyCommons
 import Observation
 import SwiftUI
 import UIKit
@@ -32,6 +33,7 @@ struct ContactsApp: App {
                 .environment(store)
                 .environment(router)
                 .environment(Config.shared)
+                .fossifyTheme()
                 .onOpenURL { url in router.importURL = url }
         }
     }
@@ -40,20 +42,17 @@ struct ContactsApp: App {
 struct RootView: View {
     @Environment(ContactsStore.self) private var store
     @Environment(Router.self) private var router
-    @Environment(Config.self) private var config
-    @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var phase
 
     var body: some View {
         @Bindable var router = router
         @Bindable var store = store
-        let palette = Palette.resolve(config, scheme: scheme)
         NavigationStack(path: $router.path) {
             Group {
                 switch store.access {
                 case .granted: MainView()
                 case .denied: PermissionDenied()
-                case .unknown: palette.backgroundColor.ignoresSafeArea()
+                case .unknown: Color.clear.paletteBackground()
                 }
             }
             .navigationDestination(for: Route.self) { route in
@@ -65,18 +64,14 @@ struct RootView: View {
                     case .group(let id): GroupContactsView(groupID: id)
                     case .settings: SettingsView()
                     case .customizeColors: CustomizeColorsView()
-                    case .about: AboutView()
+                    case .about: AboutView(app: .contacts)
                     }
                 }
                 .toolbar(.hidden, for: .navigationBar)
-                .background(palette.backgroundColor.ignoresSafeArea())
+                .paletteBackground()
             }
             .toolbar(.hidden, for: .navigationBar)
         }
-        .environment(\.palette, palette)
-        .tint(palette.primaryColor)
-        .foregroundStyle(palette.textColor)
-        .preferredColorScheme(config.theme == .system ? nil : (palette.dark ? .dark : .light))
         .toast($store.toast)
         .sheet(item: Binding(get: { router.importURL.map(IdentifiedURL.init) }, set: { router.importURL = $0?.url })) { item in
             ImportContactsDialog(url: item.url)
@@ -99,17 +94,5 @@ struct PermissionDenied: View {
             Launcher.open(URL(string: UIApplication.openSettingsURLString))
         }
         .background(palette.backgroundColor.ignoresSafeArea())
-    }
-}
-
-/// Re-enable the interactive swipe-back gesture with hidden navigation bars.
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        viewControllers.count > 1
     }
 }

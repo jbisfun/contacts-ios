@@ -1,3 +1,4 @@
+import FossifyCommons
 import Contacts
 import Foundation
 import Observation

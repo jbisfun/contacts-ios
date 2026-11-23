@@ -1,3 +1,4 @@
+import FossifyCommons
 import Foundation
 
 // Port of org.fossify.commons.helpers / org.fossify.contacts.helpers constants.
@@ -35,29 +36,6 @@ enum Tab: Int, CaseIterable, Identifiable {
         case .contacts: return selected ? "person.fill" : "person"
         case .favorites: return selected ? "star.fill" : "star"
         case .groups: return selected ? "person.3.fill" : "person.3"
-        }
-    }
-}
-
-enum FontSize: Int, CaseIterable {
-    case small = 0, medium, large, extraLarge
-
-    var title: String {
-        switch self {
-        case .small: return "Small"
-        case .medium: return "Medium"
-        case .large: return "Large"
-        case .extraLarge: return "Extra large"
-        }
-    }
-
-    /// Context.getTextSize(): smaller/normal/big/extra_big text sizes.
-    var points: CGFloat {
-        switch self {
-        case .small: return 12
-        case .medium: return 14
-        case .large: return 18
-        case .extraLarge: return 22
         }
     }
 }

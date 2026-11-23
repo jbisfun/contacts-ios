@@ -13,6 +13,7 @@ targets:
     build_number: "1"
     min_ios: "17.0"
     device_family: "1,2"
+    link: [FossifyCommons]
     sources: [Sources]
     resources: [Resources/Assets.xcassets]
     frameworks: [SwiftUI, UIKit, Foundation, Contacts, PhotosUI]
@@ -42,3 +43,12 @@ targets:
       debug:
         entitlements:
           get-task-allow: true
+
+  # Shared core (fossify-ios/commons-ios), compiled into the app as a static Swift module.
+  - name: FossifyCommons
+    type: static
+    dir: ../commons-ios
+    min_ios: "17.0"
+    sources: [Sources]
+    frameworks: [SwiftUI, UIKit, Foundation]
+    swift_version: "5.0"
