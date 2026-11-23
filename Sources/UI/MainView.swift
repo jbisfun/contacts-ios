@@ -260,6 +260,7 @@ struct MainView: View {
 
     private var searchBar: some View {
         HStack(spacing: 0) {
+            if !searching { CloseAppButton() }
             Button {
                 if searching {
                     query = ""

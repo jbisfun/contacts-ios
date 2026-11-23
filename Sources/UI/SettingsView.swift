@@ -107,5 +107,5 @@ struct SettingsView: View {
 }
 
 extension AppInfo {
-    static let contacts = AppInfo(name: "Contacts", icon: "person.fill", upstream: "Contacts", port: "contacts-ios", policy: "contacts")
+    public static let contacts = AppInfo(name: "Contacts", icon: "person.fill", upstream: "Contacts", port: "contacts-ios", policy: "contacts")
 }

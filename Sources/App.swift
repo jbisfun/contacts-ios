@@ -23,19 +23,25 @@ final class Router {
     func pop() { if !path.isEmpty { path.removeLast() } }
 }
 
-struct ContactsApp: App {
+/// The whole app as one view: the standalone app's window content, and what
+/// the launcher presents. `importURL` is a vCard handed over by the launcher.
+public struct ContactsRoot: View {
     @State private var store = ContactsStore()
     @State private var router = Router()
+    private let importURL: URL?
 
-    var body: some Scene {
-        WindowGroup {
-            RootView()
-                .environment(store)
-                .environment(router)
-                .environment(Config.shared)
-                .fossifyTheme()
-                .onOpenURL { url in router.importURL = url }
-        }
+    public init(importURL: URL? = nil) {
+        self.importURL = importURL
+    }
+
+    public var body: some View {
+        RootView()
+            .environment(store)
+            .environment(router)
+            .environment(Config.shared)
+            .fossifyTheme()
+            .onOpenURL { url in router.importURL = url }
+            .onAppear { if let importURL { router.importURL = importURL } }
     }
 }
 
