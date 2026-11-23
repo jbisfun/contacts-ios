@@ -86,6 +86,7 @@ struct ContactsList: View {
     let onClick: (Contact) -> Void
     let onAvatar: (Contact) -> Void
     var onMove: ((IndexSet, Int) -> Void)?
+    @State private var scrolledID: String?
 
     private var grid: Bool { location == .favorites && config.favoritesViewType == .grid }
 
@@ -93,8 +94,7 @@ struct ContactsList: View {
         let sorting = config.sorting
         let surnameFirst = config.startNameWithSurname
         let letters = contacts.map { $0.bubbleLetter(sorting: sorting, startWithSurname: surnameFirst) }
-        ScrollViewReader { proxy in
-            ZStack(alignment: .trailing) {
+        ZStack(alignment: .trailing) {
                 if grid {
                     ScrollView {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: max(1, config.contactsGridColumnCount)), spacing: 4) {
@@ -125,20 +125,21 @@ struct ContactsList: View {
                         LazyVStack(spacing: 0) {
                             ForEach(contacts) { c in row(c) }
                         }
+                        .scrollTargetLayout()
                         .padding(.bottom, 90)
                         .padding(.trailing, 24)
                     }
+                    .scrollPosition(id: $scrolledID, anchor: .top)
                     .scrollDismissesKeyboard(.immediately)
                 }
 
                 if !grid && contacts.count > 0 && (onMove == nil || !highlight.isEmpty) {
                     let firsts = Self.firstIDs(contacts, letters)
                     LetterFastScroller(letters: firsts.map(\.0)) { l in
-                        if let id = firsts.first(where: { $0.0 == l })?.1 { proxy.scrollTo(id, anchor: .top) }
+                        if let id = firsts.first(where: { $0.0 == l })?.1 { scrolledID = id }
                     }
                     .padding(.vertical, 8)
                 }
-            }
         }
     }
 

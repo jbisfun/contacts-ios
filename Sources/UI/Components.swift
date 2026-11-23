@@ -106,22 +106,21 @@ struct LetterFastScroller: View {
                 }
                 .frame(width: 24)
                 .padding(.top, top)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { v in
-                            let i = Int((v.location.y - top) / rowH)
-                            let idx = min(max(i, 0), letters.count - 1)
-                            guard letters.indices.contains(idx) else { return }
-                            activeY = top + CGFloat(idx) * rowH + rowH / 2
-                            if active != letters[idx] {
-                                active = letters[idx]
-                                UISelectionFeedbackGenerator().selectionChanged()
-                                onSelect(letters[idx])
-                            }
+                .overlay {
+                    // UIKit touch strip: a SwiftUI DragGesture here gets cancelled by the
+                    // tab pager's UIScrollView pan as soon as the finger moves.
+                    TouchStrip { y in
+                        guard let y else { active = nil; return }
+                        let idx = min(max(Int((y - top) / rowH), 0), letters.count - 1)
+                        guard letters.indices.contains(idx) else { return }
+                        activeY = top + CGFloat(idx) * rowH + rowH / 2
+                        if active != letters[idx] {
+                            active = letters[idx]
+                            UISelectionFeedbackGenerator().selectionChanged()
+                            onSelect(letters[idx])
                         }
-                        .onEnded { _ in active = nil }
-                )
+                    }
+                }
 
                 if let active {
                     Text(active)
@@ -139,6 +138,46 @@ struct LetterFastScroller: View {
             .frame(width: geo.size.width, height: geo.size.height, alignment: .topTrailing)
         }
         .frame(width: 110)
+    }
+}
+
+/// Reports the finger's y position (nil when lifted) from touch-down on, and makes
+/// every enclosing scroll view (list, tab pager) wait until the finger is lifted.
+struct TouchStrip: UIViewRepresentable {
+    let onTouch: (CGFloat?) -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let v = UIView()
+        v.backgroundColor = .clear
+        let g = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handle(_:)))
+        g.minimumPressDuration = 0
+        g.allowableMovement = .greatestFiniteMagnitude
+        g.delegate = context.coordinator
+        v.addGestureRecognizer(g)
+        return v
+    }
+
+    func updateUIView(_ v: UIView, context: Context) { context.coordinator.onTouch = onTouch }
+    func makeCoordinator() -> Coordinator { Coordinator(onTouch: onTouch) }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onTouch: (CGFloat?) -> Void
+        init(onTouch: @escaping (CGFloat?) -> Void) { self.onTouch = onTouch }
+
+        @objc func handle(_ g: UILongPressGestureRecognizer) {
+            switch g.state {
+            case .began, .changed: onTouch(g.location(in: g.view).y)
+            default: onTouch(nil)
+            }
+        }
+
+        func gestureRecognizer(_ g: UIGestureRecognizer, shouldBeRequiredToFailBy other: UIGestureRecognizer) -> Bool {
+            other.view is UIScrollView
+        }
+
+        func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool {
+            false
+        }
     }
 }
 
