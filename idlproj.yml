@@ -1,0 +1,44 @@
+# Fossify Contacts for iOS. Build with `idl build -c release` (see README.md).
+toolchain:
+  sdk_bundle: ~/.swiftpm/swift-sdks/darwin.artifactbundle
+  swiftly_bin: ~/.local/share/swiftly/bin
+  swiftc: swiftc
+  ldid: ldid
+  actool: idl-actool
+
+targets:
+  - name: FossifyContacts
+    bundle_id: org.fossify.contacts.ios
+    version: "1.6.0"
+    build_number: "1"
+    min_ios: "17.0"
+    device_family: "1,2"
+    sources: [Sources]
+    resources: [Resources/Assets.xcassets]
+    frameworks: [SwiftUI, UIKit, Foundation, Contacts, PhotosUI]
+    swift_version: "5.0"
+    info:
+      CFBundleDisplayName: Contacts
+      NSContactsUsageDescription: Contacts needs access to your contacts to show, edit and back them up.
+      NSCameraUsageDescription: Take a photo for a contact.
+      UIFileSharingEnabled: true
+      LSSupportsOpeningDocumentsInPlace: true
+      UIApplicationSceneManifest:
+        UIApplicationSupportsMultipleScenes: false
+      UISupportedInterfaceOrientations:
+        - UIInterfaceOrientationPortrait
+        - UIInterfaceOrientationLandscapeLeft
+        - UIInterfaceOrientationLandscapeRight
+      UISupportedInterfaceOrientations~ipad:
+        - UIInterfaceOrientationPortrait
+        - UIInterfaceOrientationPortraitUpsideDown
+        - UIInterfaceOrientationLandscapeLeft
+        - UIInterfaceOrientationLandscapeRight
+      CFBundleDocumentTypes:
+        - CFBundleTypeName: vCard
+          LSHandlerRank: Alternate
+          LSItemContentTypes: [public.vcard]
+    configurations:
+      debug:
+        entitlements:
+          get-task-allow: true
